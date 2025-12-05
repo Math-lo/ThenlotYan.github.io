@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Test vi·si·cal·i·ty Visualizer Simple</title>
+
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%; background: #111;
+    display: flex; justify-content: center; align-items: center;
+    color: #0bcf6c; font-family: monospace;
+    flex-direction: column;
+  }
+  canvas {
+    border: 1px solid #0bcf6c;
+    display: block;
+    width: 600px;
+    height: 300px;
+  }
+  #controls {
+    margin-top: 20px;
+  }
+</style>
+
+<!-- vi·si·cal·i·ty -->
+<script src="https://cdn.jsdelivr.net/npm/vi-si-cal-i-ty@1.0.1/build/visuality.min.js"></script>
+</head>
+<body>
+
+<canvas id="visCanvas"></canvas>
+
+<div id="controls">
+  <button id="playBtn">Play Music</button>
+</div>
+
+<script>
+  // Setup audio
+  const audio = new Audio('musics/rap.mp3'); // Mets ton mp3 ici
+  audio.crossOrigin = "anonymous";
+
+  // AudioContext et analyser
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioContext = new AudioContext();
+
+  const sourceNode = audioContext.createMediaElementSource(audio);
+  const analyser = audioContext.createAnalyser();
+
+  sourceNode.connect(analyser);
+  analyser.connect(audioContext.destination);
+
+  // Visuality init
+  const canvas = document.getElementById('visCanvas');
+  const visualizer = new Visuality(canvas, {
+    analyser: analyser,
+    type: 'bars',
+    barsCount: 40,
+    barWidth: 8,
+    barSpacing: 4,
+    color: '#00ffff'
+  });
+
+  function animate() {
+    visualizer.update();
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Gestion du bouton play
+  document.getElementById('playBtn').addEventListener('click', () => {
+    if (audioContext.state !== 'running') {
+      audioContext.resume();
+    }
+    audio.play();
+  });
+
+</script>
+
+</body>
+</html>
